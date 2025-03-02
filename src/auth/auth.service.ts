@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma.service';
 import * as bcrypt from 'bcrypt';
 import {LoginDto} from "./dto/login.dto";
 import {JwtService} from "@nestjs/jwt";
+import {v4 as uuidv4} from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -63,18 +64,62 @@ export class AuthService {
     const passwordsMatch = await bcrypt.compare(credentials.password, user.password)
 
     if (!passwordsMatch){
-      throw new UnauthorizedException("Wrond Credentials")
+      throw new UnauthorizedException("Wrong Credentials")
     }
     //generate JWT
+    const  tokens = await this.generateUserToken(user.id);
 
-    return this.generateUserToken(user.id)
+    return {
+      ...tokens,
+      userId: user.id,
+    }
 
   }
 
+  async refreshTokens(refreshToken: string, userId){
+    const token = await this.prisma.refreshToken.findFirst({
+      where:{
+        userId: userId,
+        token: refreshToken,
+        expiresAt: { gte: new Date() }
+      }
+    })
+
+    if (!token){
+      throw new UnauthorizedException("Refresh Token invalid")
+    }
+    const deletedToken  = await this.prisma.refreshToken.delete({
+      where: {
+        id: token.id,
+      },
+    });
+    return this.generateUserToken(deletedToken.userId);
+  }
+
+
   async generateUserToken(userId){
     const accessToken = this.jwtService.sign({userId}, {expiresIn: "1h"})
+    const refreshToken = uuidv4()
 
-    return {accessToken};
+    await this.storeRefreshToken(refreshToken, userId);
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async storeRefreshToken(token: string, userId){
+
+    const expiresAt = new Date();
+    expiresAt.setDate((expiresAt.getDate() + 1));
+
+    await this.prisma.refreshToken.create({
+      data: {
+          token: token,
+          userId: userId,
+          expiresAt: expiresAt
+      }
+    });
   }
 
 }

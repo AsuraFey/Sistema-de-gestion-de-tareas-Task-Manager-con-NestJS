@@ -13,47 +13,56 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-    id        Int      @id @default(autoincrement())
-    email     String   @unique
-    username  String   @unique
-    password  String
-    roles     String[]
-    profile   Profile?
-    tasks     Task[]   @relation("User Tasks") // Relación uno a muchos con tareas
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  username     String         @unique
+  password     String
+  roles        String[]
+  profile      Profile?
+  tasks        Task[]         @relation("User Tasks") // Relación uno a muchos con tareas
+  RefreshToken RefreshToken[]
 }
 
 model Task {
-    id          Int      @id @default(autoincrement())
-    title       String
-    description String?
-    createdAt   DateTime @default(now())
-    status      String
-    userId      Int
-    user        User     @relation("User Tasks", fields: [userId], references: [id])
-    tags        TaskTag[] // Relación muchos a muchos con etiquetas
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  createdAt   DateTime  @default(now())
+  status      String
+  userId      Int
+  user        User      @relation("User Tasks", fields: [userId], references: [id])
+  tags        TaskTag[] // Relación muchos a muchos con etiquetas
 }
 
 model Profile {
-    id          Int      @id @default(autoincrement())
-    address     String?
-    phoneNumber String?
-    user        User     @relation(fields: [userId], references: [id])
-    userId      Int      @unique // Relación uno a uno con el usuario
+  id          Int     @id @default(autoincrement())
+  address     String?
+  phoneNumber String?
+  user        User    @relation(fields: [userId], references: [id])
+  userId      Int     @unique // Relación uno a uno con el usuario
 }
 
 model Tag {
-    id   Int      @id @default(autoincrement())
-    name String   @unique
-    tasks TaskTag[] // Relación muchos a muchos con tareas
+  id    Int       @id @default(autoincrement())
+  name  String    @unique
+  tasks TaskTag[] // Relación muchos a muchos con tareas
 }
 
 model TaskTag {
-    taskId Int
-    tagId  Int
-    task   Task @relation(fields: [taskId], references: [id])
-    tag    Tag  @relation(fields: [tagId], references: [id])
+  taskId Int
+  tagId  Int
+  task   Task @relation(fields: [taskId], references: [id])
+  tag    Tag  @relation(fields: [tagId], references: [id])
 
-    @@id([taskId, tagId]) // Combinación de taskId y tagId como clave primaria
+  @@id([taskId, tagId]) // Combinación de taskId y tagId como clave primaria
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
