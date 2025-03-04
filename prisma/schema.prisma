@@ -61,7 +61,7 @@ model TaskTag {
 model RefreshToken {
   id        String   @id @default(cuid())
   token     String   @unique
-  userId    Int
+  userId    Int      @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())

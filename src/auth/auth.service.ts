@@ -88,12 +88,8 @@ export class AuthService {
     if (!token){
       throw new UnauthorizedException("Refresh Token invalid")
     }
-    const deletedToken  = await this.prisma.refreshToken.delete({
-      where: {
-        id: token.id,
-      },
-    });
-    return this.generateUserToken(deletedToken.userId);
+
+    return this.generateUserToken(token.userId);
   }
 
 
@@ -108,13 +104,19 @@ export class AuthService {
     };
   }
 
-  async storeRefreshToken(token: string, userId){
+  async storeRefreshToken(token: string, userId: number){
 
     const expiresAt = new Date();
     expiresAt.setDate((expiresAt.getDate() + 1));
 
-    await this.prisma.refreshToken.create({
-      data: {
+    await this.prisma.refreshToken.upsert({
+      where: {
+        userId: userId,
+      },
+      update: {
+        token: token,
+      },
+      create: {
           token: token,
           userId: userId,
           expiresAt: expiresAt
