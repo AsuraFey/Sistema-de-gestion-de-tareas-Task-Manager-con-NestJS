@@ -29,7 +29,8 @@ model Task {
   title       String
   description String?
   createdAt   DateTime  @default(now())
-  status      String
+  dueDate     DateTime
+  status      String    @default("Asignada")
   userId      Int
   user        User      @relation("User Tasks", fields: [userId], references: [id])
   tags        TaskTag[] // Relación muchos a muchos con etiquetas
