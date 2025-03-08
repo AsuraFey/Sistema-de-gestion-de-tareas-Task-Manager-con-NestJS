@@ -65,4 +65,8 @@ export class TasksService {
 
     return this.prisma.task.delete({where: {id}});
   }
+
+  // async markAsCompleted(number: number) {
+  //   return Promise.resolve(undefined);
+  // }
 }

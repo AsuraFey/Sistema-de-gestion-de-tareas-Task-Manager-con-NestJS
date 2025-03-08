@@ -27,6 +27,11 @@ export class TasksController {
     return this.tasksService.update(+id, updateTaskDto);
   }
 
+  // @Patch(':id')
+  // async markAsCompleted(@Param('id') id: string) {
+  //   return this.tasksService.markAsCompleted(+id);
+  // }
+
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return this.tasksService.remove(+id);
