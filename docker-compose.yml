@@ -3,7 +3,7 @@ services:
   db:
     image: postgres
     ports:
-      - "5433:5432"  # Mapea el puerto 5432 del contenedor al puerto 5433 de tu máquina
+      - "5433:5432"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}

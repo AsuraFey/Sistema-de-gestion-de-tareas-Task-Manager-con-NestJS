@@ -21,7 +21,7 @@ model User {
   roles        String[]
   profile      Profile?
   tasks        Task[]         @relation("User Tasks") // Relación uno a muchos con tareas
-  RefreshToken RefreshToken[]
+  refreshToken RefreshToken[]
 }
 
 model Task {

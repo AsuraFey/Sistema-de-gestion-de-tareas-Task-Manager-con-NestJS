@@ -6,6 +6,7 @@ import { Request } from 'express';
 import { RefreshTokenDto } from "./dto/refresh-tokens.dto";
 import {LocalGuard} from "./guards/local.guard";
 import {JwtAuthGuard} from "./guards/jwt.guard";
+import {AuthGuard} from "@nestjs/passport";
 
 
 @Controller('auth')
@@ -33,5 +34,14 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async status(@Req() req: Request) {
   return req.user;
+  }
+
+  @UseGuards(AuthGuard('jwt')) // AuthGuard from passport
+  @Post('logout')
+  async logout(@Req() req: Request){
+    const user = req.user;
+    if (user) {
+      return this.authService.logout(user['id']);
+    }
   }
 }

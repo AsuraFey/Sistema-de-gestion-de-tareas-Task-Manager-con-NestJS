@@ -128,4 +128,7 @@ export class AuthService {
     });
   }
 
+  async logout(userId: number){
+    await this.prisma.user.deleteMany({where: {id: userId,}});
+  }
 }
