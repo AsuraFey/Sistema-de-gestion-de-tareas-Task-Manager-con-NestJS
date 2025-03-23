@@ -18,8 +18,8 @@ model User {
   email        String         @unique
   username     String         @unique
   password     String
-  roleId       Int?
-  role         Role?           @relation("RoleUsers", fields: [roleId], references: [id])
+  roleId       Int
+  role         Role           @relation("RoleUsers", fields: [roleId], references: [id])
   profile      Profile?
   tasks        Task[]         @relation("UserTasks") // Relación uno a muchos con tareas
   refreshToken RefreshToken[]

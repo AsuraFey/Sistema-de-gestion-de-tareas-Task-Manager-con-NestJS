@@ -24,7 +24,10 @@ export class RolesService {
     }
 
     async getRoleById(roleId: number){
-        return this.prisma.role.findUnique({where: {id: roleId}})
+        return this.prisma.role.findUnique({
+            where: { id: roleId },
+            include: { permissions: true },
+        })
     }
 
 }

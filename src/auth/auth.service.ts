@@ -5,12 +5,14 @@ import * as bcrypt from 'bcrypt';
 import {LoginDto} from "./dto/login.dto";
 import {JwtService} from "@nestjs/jwt";
 import {v4 as uuidv4} from 'uuid';
+import {RolesService} from "../roles/roles.service";
 
 @Injectable()
 export class AuthService {
   constructor(
       private prisma: PrismaService,
-      private jwtService: JwtService
+      private jwtService: JwtService,
+      private rolesService: RolesService,
   ) {}
 
   async register(userData: RegisterDto) {
@@ -43,6 +45,7 @@ export class AuthService {
         username: userData.username,
         email: userData.email,
         password: hashedPassword,
+        roleId: 2,
       },
     })
     return {
@@ -130,5 +133,22 @@ export class AuthService {
 
   async logout(userId: number){
     await this.prisma.user.deleteMany({where: {id: userId,}});
+  }
+
+
+  async getUserPermissions(userId: number){
+    const user = await this.prisma.user.findUnique({where:{id:userId}});
+
+    if (!user){
+      throw new BadRequestException("User not found")
+    }
+
+    const role = await this.rolesService.getRoleById(user.roleId)
+
+    if (!role) {
+      throw new BadRequestException('Role not found');
+    }
+
+    return role.permissions;
   }
 }
