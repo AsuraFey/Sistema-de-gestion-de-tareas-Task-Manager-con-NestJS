@@ -18,9 +18,10 @@ model User {
   email        String         @unique
   username     String         @unique
   password     String
-  roles        String[]
+  roleId       Int?
+  role         Role?           @relation("RoleUsers", fields: [roleId], references: [id])
   profile      Profile?
-  tasks        Task[]         @relation("User Tasks") // Relación uno a muchos con tareas
+  tasks        Task[]         @relation("UserTasks") // Relación uno a muchos con tareas
   refreshToken RefreshToken[]
 }
 
@@ -32,7 +33,7 @@ model Task {
   dueDate     DateTime
   status      String    @default("Asignada")
   userId      Int
-  user        User      @relation("User Tasks", fields: [userId], references: [id])
+  user        User      @relation("UserTasks", fields: [userId], references: [id])
   tags        TaskTag[] // Relación muchos a muchos con etiquetas
 }
 
@@ -66,4 +67,32 @@ model RefreshToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+model Permission {
+  id        Int      @id @default(autoincrement())
+  resource  Resource
+  actions   Action[]
+  role      Role?    @relation(fields: [roleId], references: [id])
+  roleId    Int?
+}
+
+model Role {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  permissions Permission[] // Relación con Permission
+  users       User[]    @relation("RoleUsers")
+}
+
+enum Resource {
+  settings
+  tasks
+  users
+}
+
+enum Action {
+  read
+  create
+  update
+  delete
 }
