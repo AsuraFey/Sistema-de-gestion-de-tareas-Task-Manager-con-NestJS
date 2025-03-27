@@ -7,12 +7,13 @@ import {JwtService} from "@nestjs/jwt";
 import {v4 as uuidv4} from 'uuid';
 import {RolesService} from "../roles/roles.service";
 
+
 @Injectable()
 export class AuthService {
   constructor(
       private prisma: PrismaService,
       private jwtService: JwtService,
-      private rolesService: RolesService,
+      private rolesService: RolesService
   ) {}
 
   async register(userData: RegisterDto) {

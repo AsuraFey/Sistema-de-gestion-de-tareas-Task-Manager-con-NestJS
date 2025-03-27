@@ -8,15 +8,17 @@ import config from "../config/config";
 import { PassportModule } from "@nestjs/passport";
 import { LocalStrategy } from "./strategies/local.strategy";
 import {JwtStrategy} from "./strategies/jwt.strategy";
+import {RolesModule} from "../roles/roles.module";
 
 @Module({
   imports: [
+    PassportModule,
+    RolesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
       load: [config],
     }),
-    PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (config) => ({

@@ -29,25 +29,24 @@ export class AuthorizationGuard implements CanActivate {
             const userPermissions = await this.authService.getUserPermissions(
                 request.userId
             );
-
             for (const routePermission of routePermissions) {
                 const userPermission = userPermissions.find(
                     perm => perm.resource === routePermission.resource
                 )
                 if (!userPermission) {
-                    throw new ForbiddenException()
+                   return false
                 }
 
                 const allActionsAvailable = userPermission.actions.every(
                     (requiredAction) => userPermission.actions.includes(requiredAction),
                 )
                 
-                if (!allActionsAvailable) {            
-                    throw new ForbiddenException()
-                }                                 
+                if (!allActionsAvailable) {
+                    return false
+                }
             }
         } catch (e){
-            throw new ForbiddenException();
+            throw new ForbiddenException("An error occurred while checking user permissions.");
         }
 
         return true;
