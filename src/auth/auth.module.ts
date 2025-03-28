@@ -9,8 +9,6 @@ import { PassportModule } from "@nestjs/passport";
 import { LocalStrategy } from "./strategies/local.strategy";
 import {JwtStrategy} from "./strategies/jwt.strategy";
 import {RolesModule} from "../roles/roles.module";
-import {AuthorizationGuard} from "./guards/authorization.guard";
-import {AuthGuard} from "./guards/auth.guard";
 
 @Module({
   imports: [
