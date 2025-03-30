@@ -5,10 +5,10 @@ import {Permissions} from "../decorators/permissions.decorator";
 import {Resource} from "./enums/resource.enum";
 import {Action} from "./enums/action.enums";
 import {UpdateRoleDto} from "./dto/update-role.dto";
-import {AuthGuard} from "../auth/guards/auth.guard";
+import {AuthenticationGuard} from "../auth/guards/authentication.guard";
 import {AuthorizationGuard} from "../auth/guards/authorization.guard";
 
-@UseGuards(AuthGuard, AuthorizationGuard)
+@UseGuards(AuthenticationGuard, AuthorizationGuard)
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}

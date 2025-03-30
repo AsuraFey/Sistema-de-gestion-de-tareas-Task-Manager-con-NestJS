@@ -1,4 +1,4 @@
-import {Controller, Post, Body, UseGuards, Get, Req} from '@nestjs/common';
+import {Controller, Post, Body, UseGuards, Get, Req, BadRequestException} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 // import { LoginDto } from "./dto/login.dto";
@@ -40,8 +40,9 @@ export class AuthController {
   @Post('logout')
   async logout(@Req() req: Request){
     const user = req.user;
-    if (user) {
-      return this.authService.logout(user['id']);
+    if (!user) {
+      throw new BadRequestException();
     }
+    return this.authService.logout(user['userId']);
   }
 }

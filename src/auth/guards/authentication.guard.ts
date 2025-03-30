@@ -9,7 +9,7 @@ interface UserRequest extends Request {
 }
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AuthenticationGuard implements CanActivate {
     constructor(private jwtService: JwtService) {}
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
         const request: UserRequest = context.switchToHttp().getRequest();
