@@ -66,11 +66,12 @@ export class TasksController {
   async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
     return this.tasksService.update(+id, updateTaskDto);
   }
-
-  // @Patch(':id')
-  // async markAsCompleted(@Param('id') id: string) {
-  //   return this.tasksService.markAsCompleted(+id);
-  // }
+  @Permissions([{resource: Resource.tasks, actions: [Action.delete]}])
+  @UseGuards(AuthGuard('jwt'), SelfOrAdminGuard)
+  @Patch('markAsCompleted/:id')
+  async markAsCompleted(@Param('id') id: string) {
+    return this.tasksService.markAsCompleted(+id);
+  }
 
   @Permissions([{resource: Resource.tasks, actions: [Action.delete]}])
   @Delete(':id')

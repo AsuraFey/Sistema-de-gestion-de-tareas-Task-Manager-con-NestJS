@@ -69,4 +69,15 @@ export class TasksService {
   // async markAsCompleted(number: number) {
   //   return Promise.resolve(undefined);
   // }
+  async markAsCompleted(taskId: number) {
+    const task = await this.prisma.task.findUnique({where: {id: taskId}})
+    if (!task){
+      throw new NotFoundException("Task not found")
+    }
+
+    return this.prisma.task.update({
+      where:{id: task.id},
+      data:{status: "Completada"}
+    });
+  }
 }
