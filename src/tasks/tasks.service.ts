@@ -4,6 +4,7 @@ import {UpdateTaskDto} from './dto/update-task.dto';
 import {PrismaService} from "../prisma/prisma.service";
 import {Task} from "@prisma/client";
 
+
 @Injectable()
 export class TasksService {
   constructor(private prisma: PrismaService) {}
@@ -22,9 +23,6 @@ export class TasksService {
   }
 
 
-  async findAll(): Promise<Task[]> {
-    return this.prisma.task.findMany();
-  }
 
 
   async findOne(id: number): Promise<Task> {
@@ -66,9 +64,6 @@ export class TasksService {
     return this.prisma.task.delete({where: {id}});
   }
 
-  // async markAsCompleted(number: number) {
-  //   return Promise.resolve(undefined);
-  // }
   async markAsCompleted(taskId: number) {
     const task = await this.prisma.task.findUnique({where: {id: taskId}})
     if (!task){
@@ -79,5 +74,40 @@ export class TasksService {
       where:{id: task.id},
       data:{status: "Completada"}
     });
+  }
+
+
+  async findAll(userId: number, skip: number, take: number, status?: string) {
+    if (skip < 0) skip = 0;
+    if (take <= 0) take = 10;
+
+    const whereClause = {
+      userId: userId,
+      ...(status && { status: status })
+    };
+
+    const [tasks, total] = await Promise.all([
+      this.prisma.task.findMany({
+        where: whereClause,
+        skip: skip,
+        take: take,
+      }),
+      this.prisma.task.count({
+        where: whereClause,
+      }),
+    ]);
+
+    const currentPage = Math.floor(skip / take) + 1;
+    const totalPages = Math.ceil(total / take);
+
+    return {
+      tasks,
+      total,
+      hasMore: total > skip + take,
+      links: {
+        previous: currentPage > 1 ? `/tasks?skip=${skip - take}&take=${take}` : null,
+        next: currentPage < totalPages ? `/tasks?skip=${skip + take}&take=${take}` : null,
+      },
+    };
   }
 }

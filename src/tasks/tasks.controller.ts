@@ -7,7 +7,7 @@ import {
   NotFoundException,
   Param,
   Patch,
-  Post,
+  Post, Query,
   Req,
   UseGuards
 } from '@nestjs/common';
@@ -26,7 +26,7 @@ import {SelfOrAdminGuard} from "./guards/selfOrAdmin.guard";
 
 
 @Controller('tasks')
-@UseGuards(AuthenticationGuard, AuthorizationGuard)
+@UseGuards(AuthenticationGuard, AuthorizationGuard, AuthGuard('jwt'))
 export class TasksController {
   constructor(
       private readonly tasksService: TasksService,
@@ -34,7 +34,6 @@ export class TasksController {
   ) {}
 
   @Permissions([{ resource: Resource.tasks, actions: [Action.create]}])
-  @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body() createTaskDto: CreateTaskDto, @Req() req: Request) {
     if (!req.user) {
@@ -50,11 +49,26 @@ export class TasksController {
     throw new BadRequestException('You do not have permission to create a task to other user')
   }
 
+  @Permissions([{resource: Resource.tasks, actions: [Action.read]}])
   @Get()
-  async findAll() {
-    return this.tasksService.findAll();
+  async findAll(
+      @Req() req: Request,
+      @Query("skip") skip: number = 0,
+      @Query("take") take: number = 10,
+      @Query('status') status?: string,
+
+  ){
+    const user = req.user
+
+    if(!user){
+      throw new BadRequestException()
+    }
+
+    return this.tasksService.findAll(+user['userId'], +skip, +take, status);
   }
 
+  @Permissions([{resource: Resource.tasks, actions: [Action.read]}])
+  @UseGuards(SelfOrAdminGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.tasksService.findOne(+id);
@@ -62,12 +76,12 @@ export class TasksController {
 
   @Permissions([{resource: Resource.tasks, actions: [Action.update]}])
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'), SelfOrAdminGuard)
+  @UseGuards(SelfOrAdminGuard)
   async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
     return this.tasksService.update(+id, updateTaskDto);
   }
   @Permissions([{resource: Resource.tasks, actions: [Action.delete]}])
-  @UseGuards(AuthGuard('jwt'), SelfOrAdminGuard)
+  @UseGuards(SelfOrAdminGuard)
   @Patch('markAsCompleted/:id')
   async markAsCompleted(@Param('id') id: string) {
     return this.tasksService.markAsCompleted(+id);
@@ -75,7 +89,7 @@ export class TasksController {
 
   @Permissions([{resource: Resource.tasks, actions: [Action.delete]}])
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'), SelfOrAdminGuard)
+  @UseGuards(SelfOrAdminGuard)
   async remove(@Param('id') id: string) {
       return this.tasksService.remove(+id)
   }
