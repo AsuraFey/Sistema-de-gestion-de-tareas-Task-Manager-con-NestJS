@@ -33,9 +33,9 @@ export class MailerService {
 
         const transport = this.mailTransport();
         const options: Mail.Options = {
-            from: from?? {
-                name: "TaskManager", //this.configService.get<string>('APP_NAME'),
-                address: "alexydelgado@gmail.com"//this.configService.get<string>('DEFAULT_MAIL_FROM'),
+            from: {
+                name: this.configService.get<string>('APP_NAME') || 'TaskManager',
+                address: this.configService.get<string>('DEFAULT_MAIL_FROM') || 'alexydelgado566@gmail.com',
             },
             to: to,
             subject,
@@ -48,5 +48,9 @@ export class MailerService {
             console.log("Error: ", error)
         }
 
+    }
+
+    testEnv(){
+        return this.configService.get<string>("APP_NAME");
     }
 }

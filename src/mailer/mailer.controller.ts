@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import {Controller, Post} from '@nestjs/common';
 import { MailerService } from './mailer.service';
 import {SendEmailDto} from "./dto/mail.dto";
 
@@ -6,7 +6,9 @@ import {SendEmailDto} from "./dto/mail.dto";
 export class MailerController {
   constructor(private readonly mailerService: MailerService) {}
 
+  @Post()
   async sendMail(emailDto: SendEmailDto){
     return await this.mailerService.sendEmail(emailDto)
   }
+
 }
