@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { TasksModule } from './tasks/tasks.module';
 import { RolesModule } from './roles/roles.module';
+import { MailerModule } from './mailer/mailer.module';
+import {ConfigModule} from "@nestjs/config";
 
 
 @Module({
@@ -11,6 +13,10 @@ import { RolesModule } from './roles/roles.module';
       AuthModule,
       TasksModule,
       RolesModule,
+      MailerModule,
+      ConfigModule.forRoot({
+          isGlobal: true,
+      }),
   ],
   controllers: [AppController],
   providers: [AppService],
